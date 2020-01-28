@@ -5,7 +5,7 @@
  */
 package org.acme;
 
-//import classesToDelete.ConfigJsonObject;
+import classesToDelete.ConfigJsonObject;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -51,12 +51,12 @@ public class EntryConsumer {
         JsonElement testJson = jsonObj.getAsJsonArray("rows").get(0).getAsJsonObject().get("value").deepCopy();
         JsonObject finalJson = new JsonObject();
         finalJson.add("conditions", testJson);
-  
-        ConfigJasonObject cjObj = new ConfigJasonObject("routingConsumer");
+
+        ConfigJsonObject cjObj = new ConfigJsonObject("routingConsumer");
         cjObj.convertJsonToEntity(finalJson.toString());
-        
+
         System.out.println(cjObj.toString());
         cjObj.director();
-        
+
     }
 }

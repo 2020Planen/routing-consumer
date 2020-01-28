@@ -38,7 +38,7 @@ public class HttpTest {
         JsonElement testJson = jsonObj.getAsJsonArray("rows").get(0).getAsJsonObject().get("value").deepCopy();
         JsonObject finalJson = new JsonObject();
         finalJson.add("conditions", testJson);
-        
+
         System.out.println(finalJson);
 
     }
