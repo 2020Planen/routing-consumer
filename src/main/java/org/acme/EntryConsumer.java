@@ -31,7 +31,7 @@ public class EntryConsumer {
         URL getUrl = new URL(url);
         Scanner scanner = new Scanner(getUrl.openStream());
         String response = scanner.useDelimiter("\\Z").next();
-        scanner.close();
+        scanner.close();  
 
         return response;
     }
