@@ -27,11 +27,11 @@ public class RoutingConsumer {
     Gson gson = new Gson();
 
     @Incoming("routing")
-    public void consume(String msg) throws IOException, Exception {
-        PlayGround pg = new PlayGround("routing", msg);
-
+    public void consume(String content) throws IOException, Exception {
+        Message msg = gson.fromJson(content, Message.class);
+        msg.startLog("routing");
         
-        String producerRef = pg.getJsonMessage().get("producerReference").toString();
+        String producerRef = msg.getProducerReference();
         String conditionsStr = getJsonData(url + producerRef + "");
         JsonObject conditionsJson = new JsonParser().parse(conditionsStr).getAsJsonObject();
 
@@ -43,10 +43,10 @@ public class RoutingConsumer {
                 .get("value")
                 .deepCopy();
 
-        pg.appendJson("conditions", conditionsElm);
+        gson.fromJson(conditionsElm, Message.class);
         
         
-        pg.routingSlipDirector();
+        msg.sendToKafkaQue();
 
     }
 
