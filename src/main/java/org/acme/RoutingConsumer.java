@@ -61,9 +61,10 @@ public class RoutingConsumer {
 
          */
         
-        // Ny kode med brug af Jackson. Den laver et nyt objekt med samme hashkode
+        // Ny kode med brug af Jackson. Den laver et nyt objekt med samme hash-kode
         // Det er kun blevet testet i test-klassen, men det brude virke
         // Taget udgangspunkt i dette: https://www.logicbig.com/tutorials/misc/jackson/reader-for-updating.html 
+        
         JsonObject conditionsJson = new JsonParser().parse(conditionsStr).getAsJsonObject();
         JsonElement conditionsElm = conditionsJson
                 .getAsJsonArray("rows")
@@ -75,20 +76,19 @@ public class RoutingConsumer {
         String conditionssList = "{\"conditionsList\":" + conditionsElm + "}";
         System.out.println(conditionssList);
 
-        msg.startLog("ReciverAPI");
         msg.setEntryTime(System.currentTimeMillis());
-        msg.setProducerReference("testPR");
-        msg.endLog();
 
-        System.out.println("OLD MESSAGE: " + msg.toString());
-        System.out.println(System.identityHashCode(msg));
+        System.out.println("OLD MESSAGE:__________________________" + msg.toString());
+        System.out.println("old Hash: " + System.identityHashCode(msg));
 
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectReader objectReader = objectMapper.readerForUpdating(msg);
         Message newMsg = objectReader.readValue(conditionssList);
 
-        System.out.println("New MESSAGE: " + newMsg.toString());
-        System.out.println(System.identityHashCode(newMsg));
+        System.out.println("New MESSAGE:__________________________" + newMsg.toString());
+        System.out.println("new Hash: " + System.identityHashCode(newMsg));
+        
+        newMsg.endLog();
 
         newMsg.sendToKafkaQue();
 
