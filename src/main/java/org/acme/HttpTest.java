@@ -5,6 +5,9 @@
  */
 package org.acme;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -12,6 +15,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
+import org.acme.jsonObjectMapper.Message;
 
 /**
  *
@@ -28,19 +32,46 @@ public class HttpTest {
         return response;
     }
 
+    Gson gson = new Gson();
+
     public static void main(String[] args) throws IOException {
-        String param = "testParam";
+
+        String url = "http://cis-x.convergens.dk:5984/routingslips/_design/RoutingSlip/_view/by_producerReference?key=";
         HttpTest httpTest = new HttpTest();
-        String json = httpTest.getHttpData("http://cis-x.convergens.dk:5984/routingslips/_design/RoutingSlip/_view/by_producerReference?key=\"" + param + "\"");
+        String conditionsStr = httpTest.getHttpData(url + "%22" + "address" + "%22");
+        
+        JsonObject conditionsJson = new JsonParser().parse(conditionsStr).getAsJsonObject();
+        JsonElement conditionsElm = conditionsJson
+                .getAsJsonArray("rows")
+                .get(0)
+                .getAsJsonObject()
+                .get("value")
+                .getAsJsonArray();
+        
+        String conditionssList = "{\"conditionsList\":" + conditionsElm+ "}";
+        System.out.println(conditionssList);
+        
+        
+        
+        
+        
+        Message message = new Message();
+        message.startLog("ReciverAPI");
+        message.setEntryTime(System.currentTimeMillis());
+        message.setProducerReference("testPR");
+        message.endLog();
+        
+        
+        
+        System.out.println("OLD MESSAGE: " + message.toString());
+        System.out.println(System.identityHashCode(message));
 
-        JsonObject jsonObj = new JsonParser().parse(json).getAsJsonObject();
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectReader objectReader = objectMapper.readerForUpdating(message);
+        Message newMsg = objectReader.readValue(conditionssList);
 
-        JsonElement testJson = jsonObj.getAsJsonArray("rows").get(0).getAsJsonObject().get("value").deepCopy();
-        JsonObject finalJson = new JsonObject();
-        finalJson.add("conditions", testJson);
-
-        System.out.println(finalJson);
-
+        System.out.println("New MESSAGE: " + newMsg.toString());   
+        System.out.println(System.identityHashCode(newMsg));
     }
 
 }
